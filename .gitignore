@@ -135,4 +135,10 @@ dmypy.json
 cython_debug/
 
 # VSCode
-.vscode/ 
+.vscode/
+
+# Chrome persistent profile (contains login cookies)
+.chrome_profile/
+
+# Scraped data
+data/

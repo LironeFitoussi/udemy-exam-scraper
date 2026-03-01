@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(printf \"\\\\n\")",
+      "Bash(timeout 45 python main.py)",
+      "Bash(reg query \"HKEY_CURRENT_USER\\\\Software\\\\Google\\\\Chrome\\\\BLBeacon\" /v version)",
+      "Bash(reg query \"HKLM\\\\SOFTWARE\\\\Wow6432Node\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\Google Chrome\" /v DisplayVersion)",
+      "Bash(powershell -command \"\\(Get-Item ''C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe''\\).VersionInfo.FileVersion\")",
+      "Bash(powershell -command \"\\(Get-Item ''C:\\\\Program Files \\(x86\\)\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe''\\).VersionInfo.FileVersion\")",
+      "Read(//c/Developer/udemy-exam-scraper/$USERPROFILE/.wdm/drivers/**)",
+      "Read(//c/Developer/udemy-exam-scraper/$USERPROFILE/.wdm/drivers/chromedriver/**)"
+    ]
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "project": {
+    "name": "Udemy Exam Scraper",
+    "description": "Selenium-based scraper for extracting exam questions from Udemy courses",
+    "type": "automation",
+    "language": "Python",
+    "version": "1.0.0"
+  },
+  "agents": {
+    "enabled": [
+      "test-runner",
+      "scraper-analyzer",
+      "code-explorer",
+      "feature-builder"
+    ],
+    "test-runner": {
+      "description": "Runs pytest tests with coverage and watch modes",
+      "tools": ["bash", "read", "grep"]
+    },
+    "scraper-analyzer": {
+      "description": "Validates scraped data and diagnoses scraping issues",
+      "tools": ["read", "grep", "write", "bash"]
+    },
+    "code-explorer": {
+      "description": "Explores codebase and understands architecture",
+      "tools": ["glob", "grep", "read"]
+    },
+    "feature-builder": {
+      "description": "Plans and implements new features and page objects",
+      "tools": ["read", "glob", "grep", "write", "edit"]
+    }
+  },
+  "commands": {
+    "enabled": [
+      "run",
+      "test",
+      "add-page",
+      "validate",
+      "lint",
+      "debug",
+      "export-exams"
+    ],
+    "run": {
+      "description": "Execute scraper interactively or headless",
+      "executable": "python main.py"
+    },
+    "test": {
+      "description": "Run pytest test suite",
+      "executable": "pytest tests/"
+    },
+    "add-page": {
+      "description": "Create new page object scaffold",
+      "template": true
+    },
+    "validate": {
+      "description": "Validate scraped exam data",
+      "executable": "python utils/validator.py"
+    },
+    "lint": {
+      "description": "Run code quality checks",
+      "tools": ["flake8", "black", "bandit"]
+    },
+    "debug": {
+      "description": "Run scraper with verbose logging and screenshots",
+      "executable": "python main.py --debug"
+    },
+    "export-exams": {
+      "description": "Export data to JSON/CSV/Excel/PDF",
+      "executable": "python utils/exporter.py"
+    }
+  },
+  "hooks": {
+    "enabled": [
+      "pre-edit-security",
+      "post-test-report",
+      "pre-commit-checks",
+      "data-validation-hook"
+    ],
+    "pre-edit-security": {
+      "description": "Detect and warn about security issues before editing",
+      "triggers": ["edit", "write"]
+    },
+    "post-test-report": {
+      "description": "Generate test summary after test execution",
+      "triggers": ["post-test"]
+    },
+    "pre-commit-checks": {
+      "description": "Run checks before allowing commits",
+      "triggers": ["pre-commit"]
+    },
+    "data-validation-hook": {
+      "description": "Validate scraped data on modification",
+      "triggers": ["data-change", "export"]
+    }
+  },
+  "project_structure": {
+    "config": {
+      "description": "Configuration files and settings",
+      "files": ["config.py"]
+    },
+    "pages": {
+      "description": "Page object classes (POM pattern)",
+      "files": ["base_page.py", "*.py"]
+    },
+    "utils": {
+      "description": "Utility functions and helpers",
+      "files": ["driver_factory.py", "*.py"]
+    },
+    "tests": {
+      "description": "Pytest test files (to be created)",
+      "files": ["test_*.py"]
+    },
+    "data": {
+      "description": "Scraped exam data (gitignored)",
+      "files": ["*.json"]
+    }
+  },
+  "development": {
+    "python_version": "3.6+",
+    "virtual_env": ".venv",
+    "test_framework": "pytest",
+    "code_style": "PEP 8",
+    "dependencies": {
+      "selenium": "4.21.0",
+      "webdriver-manager": "latest",
+      "pytest": "latest",
+      "pytest-cov": "latest"
+    }
+  },
+  "claude_features": {
+    "auto_memory": true,
+    "memory_path": "C:\\Users\\liron\\.claude\\projects\\c--Developer-udemy-exam-scraper\\memory\\",
+    "agents_enabled": true,
+    "commands_enabled": true,
+    "hooks_enabled": true,
+    "theme": "dark"
+  }
+}

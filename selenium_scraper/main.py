@@ -24,18 +24,21 @@ def main():
 
         udemy_page = UdemyPage(driver)
 
-        # Prompt for exam URL (default from .env)
+        # Resolve exam URL - use .env default or prompt if not set
         default_url = os.getenv("UDEMY_EXAM_URL", "")
-        print("\n" + "=" * 60)
-        prompt = f"Exam URL [{default_url[:60]}...]: " if default_url else "Paste the Udemy exam URL to scrape: "
-        exam_url = input(prompt).strip() or default_url
-        if not exam_url:
-            print("[x] No URL provided")
-            sys.exit(1)
+        if default_url:
+            exam_url = default_url
+            print(f"\n[*] Using exam URL from .env")
+        else:
+            print("\n" + "=" * 60)
+            exam_url = input("Paste the Udemy exam URL to scrape: ").strip()
+            if not exam_url:
+                print("[x] No URL provided")
+                sys.exit(1)
 
         # Navigate directly to exam URL - if session is active (persistent profile)
         # the page loads straight in; otherwise we detect the login wall and auth
-        print(f"\n[*] Navigating to exam: {exam_url}")
+        print(f"[*] Navigating to: {exam_url}")
         driver.get(exam_url)
         udemy_page.wait_for_url_change("about:blank", timeout=15)
 

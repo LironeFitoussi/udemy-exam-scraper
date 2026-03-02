@@ -57,17 +57,22 @@ class LoginPage(BasePage):
             print("[+] Entered password")
 
             print("[*] Submitted credentials, waiting for redirect...")
-            # Wait for Google auth window to close (redirects back to Udemy)
+            # Wait until only one window remains (popup closed, main window still open)
+            # OR until the popup navigates away from accounts.google.com
             try:
                 WebDriverWait(self.driver, 30).until(
-                    lambda d: new_handle not in d.window_handles
+                    lambda d: len(d.window_handles) == 1 or new_handle not in d.window_handles
                 )
-                print("[+] Google auth window closed")
+                print("[+] Google auth completed")
             except Exception:
-                print("[!] Auth window still open - switching back to main window")
+                print("[!] Timeout waiting for auth to complete")
 
-            # Switch back to main Udemy window
-            self.driver.switch_to.window(main_window)
+            # Switch to whichever window is still alive (main_window or any remaining)
+            handles = self.driver.window_handles
+            if main_window in handles:
+                self.driver.switch_to.window(main_window)
+            elif handles:
+                self.driver.switch_to.window(handles[0])
             print("[+] Switched back to main window")
 
         except Exception as e:

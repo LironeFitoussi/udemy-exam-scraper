@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "This is a professional and robust base for a Python Selenium automation framework, built using the Page Object Model (POM) design pattern. It provides a solid foundation for creating scalable and maintainable web automation scripts.",
   "scripts": {
-    "installer": "pip install -r requirements.txt",
-    "start": "python main.py"
+    "installer": "pip install -r selenium_scraper/requirements.txt",
+    "start": "python selenium_scraper/main.py"
   }
 }

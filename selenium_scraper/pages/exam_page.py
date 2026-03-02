@@ -1,3 +1,4 @@
+import re
 import random
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -20,7 +21,7 @@ class ExamPage(BasePage):
 
     # Result pane - matches both "Correct answer" (single) and "Correct selection" (multi)
     RESULT_CONTAINER = (By.XPATH, "//div[@class[contains(.,'question-result--question-result')]]")
-    CORRECT_ANSWER_PANES = (By.XPATH, "//div[@data-purpose='answer'][.//*[contains(text(),'Correct answer') or contains(text(),'Correct selection')]]//div[@data-purpose='answer-body']//*[@data-purpose[contains(.,'rich-text-viewer')]]")
+    CORRECT_ANSWER_PANES = (By.XPATH, "//div[@data-purpose='answer'][contains(@class,'answer-result-pane--answer-correct--')]//div[@data-purpose='answer-body']//*[@data-purpose[contains(.,'rich-text-viewer')]]")
     EXPLANATION = (By.XPATH, "//*[@id='overall-explanation']")
 
     # Navigation
@@ -29,6 +30,32 @@ class ExamPage(BasePage):
 
     def __init__(self, driver):
         super().__init__(driver)
+
+    @staticmethod
+    def _html_to_text_with_images(html):
+        """Convert innerHTML to text, preserving image URLs as ![image](url) markers."""
+        if not html:
+            return None
+        # Replace <img> tags with markdown-style image references
+        text = re.sub(
+            r'<img[^>]+src=["\']([^"\']+)["\'][^>]*>',
+            r'\n![image](\1)\n',
+            html,
+        )
+        # Replace <br> and block-level closing tags with newlines
+        text = re.sub(r'<br\s*/?>',  '\n', text)
+        text = re.sub(r'</(?:p|div|li|h[1-6])>', '\n', text)
+        # Replace <a> tags - keep the href
+        text = re.sub(
+            r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
+            r'\2',
+            text,
+        )
+        # Strip all remaining HTML tags
+        text = re.sub(r'<[^>]+>', '', text)
+        # Collapse excessive blank lines
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        return text.strip()
 
     def click_begin_or_retake(self):
         """Click 'Begin test' or 'Retake test' - whichever appears first"""
@@ -57,18 +84,23 @@ class ExamPage(BasePage):
         print("[+] Clicked Practice mode card")
 
     def get_question_text(self):
-        """Get the current question text"""
+        """Get the current question text (preserves image URLs)"""
         el = self.find_element(*self.QUESTION_TEXT, timeout=15)
-        return el.text.strip() if el else None
+        if not el:
+            return None
+        html = el.get_attribute("innerHTML")
+        return self._html_to_text_with_images(html)
 
     def get_answer_options(self):
-        """Return list of {index, text} for all answer options"""
+        """Return list of {index, text} for all answer options (preserves image URLs)"""
         inputs = self.find_elements(*self.ANSWER_INPUTS, timeout=10)
         labels = self.find_elements(*self.ANSWER_LABELS, timeout=10)
         options = []
         for inp, label in zip(inputs, labels):
             idx = inp.get_attribute("data-index")
-            options.append({"index": int(idx), "text": label.text.strip()})
+            html = label.get_attribute("innerHTML")
+            text = self._html_to_text_with_images(html)
+            options.append({"index": int(idx), "text": text})
         return options
 
     def _is_multi_select(self):
@@ -124,12 +156,16 @@ class ExamPage(BasePage):
         Returns a list (single-item for radio, multi-item for checkbox questions).
         """
         els = self.find_elements(*self.CORRECT_ANSWER_PANES, timeout=10)
-        return [el.text.strip() for el in els if el.text.strip()]
+        return [self._html_to_text_with_images(el.get_attribute("innerHTML"))
+                for el in els if el.get_attribute("innerHTML").strip()]
 
     def get_explanation(self):
-        """Get the overall explanation text"""
+        """Get the overall explanation text (preserves image URLs)"""
         el = self.find_element(*self.EXPLANATION, timeout=10)
-        return el.text.strip() if el else None
+        if not el:
+            return None
+        html = el.get_attribute("innerHTML")
+        return self._html_to_text_with_images(html)
 
     def scrape_current_question(self):
         """
